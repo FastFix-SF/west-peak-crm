@@ -1,0 +1,88 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Preload critical fonts to reduce render-blocking -->
+    <link rel="preload" href="https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiJ-Ek-_EeA.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="https://fonts.gstatic.com/s/playfairdisplay/v30/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKdFvXDXbtXK-F2qO0isEw.woff2" as="font" type="font/woff2" crossorigin>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Resource hints for better caching and performance -->
+    <link rel="preload" href="/src/main.tsx" as="script" crossorigin>
+    <link rel="prefetch" href="/lovable-uploads/0d76378a-7b98-4fbd-a8d5-ec44aab639bf.png">
+    <link rel="prefetch" href="/lovable-uploads/e38fb4df-7d2e-46af-847f-533d8f57166b.png">
+    <link rel="prefetch" href="/lovable-uploads/46e86e6f-b5da-4830-bf41-b71314e8818a.png">
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    
+    <!-- Cache control meta tags -->
+    <meta http-equiv="Cache-Control" content="public, max-age=31536000, immutable">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#0b3040">
+    
+    <!-- Favicons and App Icons -->
+    <link rel="icon" type="image/x-icon" href="https://storage.googleapis.com/gpt-engineer-file-uploads/rolzmHaQcZRDmuuoXleqJVyyaCI3/uploads/1764380081189-AI photo editing (29).png">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    
+    <!-- Apple PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Roofing Friend">
+    
+    <!-- Microsoft PWA Meta Tags -->
+    <meta name="msapplication-TileColor" content="#0b3040">
+    <meta name="msapplication-TileImage" content="/icons/icon-192.png">
+    
+    <title>Roofing Friend - Premium Metal Roofing Panels</title>
+    <meta name="description" content="Professional metal roofing panels and solutions. R-Panels, Multi-V systems with custom configurations and competitive pricing.">
+    <meta name="author" content="Roofing Friend" />
+
+    <!-- Open Graph Tags for Social Media -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://e48134d4-1e37-4df9-b2e9-373e5ead16c5.lovableproject.com" />
+    <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/mGCnaaVrSyW2ir3KjAHez7k73vh2/social-images/social-1766795290502-c95ee82e-e430-452b-b1f4-e1ee7a33da6b.png">
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="Roofing Friend" />
+    
+    
+
+    <!-- Twitter Card Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/mGCnaaVrSyW2ir3KjAHez7k73vh2/social-images/social-1766795290502-c95ee82e-e430-452b-b1f4-e1ee7a33da6b.png">
+    <meta name="twitter:site" content="@roofingfriend" />
+    
+    
+    <meta property="og:title" content="Roofing Friend - Premium Metal Roofing Panels">
+  <meta name="twitter:title" content="Roofing Friend - Premium Metal Roofing Panels">
+  <meta property="og:description" content="Professional metal roofing panels and solutions. R-Panels, Multi-V systems with custom configurations and competitive pricing.">
+  <meta name="twitter:description" content="Professional metal roofing panels and solutions. R-Panels, Multi-V systems with custom configurations and competitive pricing.">
+</head>
+
+  <body>
+    <div id="root"></div>
+    <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
+    <!-- Conditionally load Lovable editor tooling ONLY when NOT running as native Capacitor app -->
+    <script type="module">
+      // Detect Capacitor native very early - before any tooling loads
+      const isNative = window.Capacitor?.isNativePlatform?.() || 
+                       (typeof navigator !== 'undefined' && navigator.userAgent?.includes('Capacitor'));
+      
+      if (!isNative) {
+        // Only load editor tooling in web browser (not native iOS/Android)
+        import('https://cdn.gpteng.co/gptengineer.js');
+      } else {
+        console.log('[Native] Skipping Lovable editor tooling in native app');
+      }
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
