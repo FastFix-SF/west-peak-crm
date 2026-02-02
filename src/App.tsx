@@ -22,6 +22,7 @@ import { AdminLayout } from "./components/layout/AdminLayout";
 import { MobileAdminGuard } from "./mobile/components/guards/MobileAdminGuard";
 import { MobileShiftGuard } from "./mobile/components/guards/MobileShiftGuard";
 import { ChunkLoadErrorBoundary } from "./components/ChunkLoadErrorBoundary";
+import { ThemeProvider } from "./components/ThemeProvider";
 import AdminDashboardPage from "./pages/AdminDashboard";
 
 // Retry wrapper for React.lazy() imports (helps with transient Vite/SW cache issues)
@@ -385,23 +386,25 @@ function App() {
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
-          <LanguageProvider>
-            <MobileProvider>
-              <AuthProvider>
-                <TenantProvider>
-                  <UpdatesProvider>
-                  <CartProvider>
-                    <SearchProvider>
-                      <TooltipProvider>
-                        <AppContent />
-                      </TooltipProvider>
-                    </SearchProvider>
-                  </CartProvider>
-                </UpdatesProvider>
-                </TenantProvider>
-              </AuthProvider>
-            </MobileProvider>
-          </LanguageProvider>
+          <ThemeProvider>
+            <LanguageProvider>
+              <MobileProvider>
+                <AuthProvider>
+                  <TenantProvider>
+                    <UpdatesProvider>
+                    <CartProvider>
+                      <SearchProvider>
+                        <TooltipProvider>
+                          <AppContent />
+                        </TooltipProvider>
+                      </SearchProvider>
+                    </CartProvider>
+                  </UpdatesProvider>
+                  </TenantProvider>
+                </AuthProvider>
+              </MobileProvider>
+            </LanguageProvider>
+          </ThemeProvider>
         </BrowserRouter>
       </QueryClientProvider>
     </HelmetProvider>
