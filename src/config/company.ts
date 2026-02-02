@@ -1,116 +1,159 @@
 /**
  * Centralized Company Configuration
  * 
- * Update this file when deploying for a new company.
- * All branding, contact info, and company details are managed here.
+ * This file imports from business.json for personalized tenant data.
+ * All branding, contact info, and company details come from the JSON config.
  */
 
+import business from './business.json';
+
+// Type for the business.json structure
+interface BusinessData {
+  name: string;
+  tagline: string;
+  description: string;
+  phone: string;
+  phoneRaw: string;
+  email: string;
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    zip: string;
+    full: string;
+  };
+  owner?: string;
+  logo: string;
+  colors: {
+    primary: string;
+    secondary: string;
+    accent: string;
+  };
+  hours: string;
+  certifications: string[];
+  uniqueSellingPoints: string[];
+  social: {
+    facebook?: string;
+    instagram?: string;
+    linkedin?: string;
+    yelp?: string;
+    youtube?: string;
+    tiktok?: string;
+    google?: string;
+  };
+  seo: {
+    siteUrl: string;
+    defaultTitle: string;
+    titleTemplate: string;
+    description: string;
+    keywords: string[];
+  };
+  hero?: {
+    headline: string;
+    headlineHighlight: string;
+    subheadline: string;
+    ctaPrimary?: string;
+    ctaSecondary?: string;
+  };
+  trustIndicators?: Array<{
+    icon: string;
+    text: string;
+  }>;
+  statistics?: Array<{
+    icon: string;
+    number: string;
+    label: string;
+    description: string;
+  }>;
+  certificationLogos?: Array<{
+    src: string;
+    alt: string;
+  }>;
+  ratings?: {
+    average: string;
+    count: string;
+    platform?: string;
+  };
+}
+
+const businessData = business as unknown as BusinessData;
+
 export const companyConfig = {
-  // Company Identity
-  name: "The Roofing Friend",
+  // Company Identity - loaded from business.json
+  name: businessData.name,
+  legalName: businessData.name,
+  shortName: businessData.name,
+  tagline: businessData.tagline || "",
+  description: businessData.description || "",
   
   // Website URL (for payment links, sharing, etc.)
-  websiteUrl: "https://www.roofingfriend.com",
-  legalName: "THE ROOFING FRIEND, INC",
-  shortName: "Roofing Friend",
-  tagline: "We Can, We Will",
-  description: "Your trusted partner for premium metal roofing solutions across the San Francisco Bay Area. Licensed, insured, and committed to excellence.",
+  websiteUrl: businessData.seo?.siteUrl || "",
   
   // Contact Information
-  phone: "(415) 697-1849",
-  phoneRaw: "+14156971849",
-  email: "roofingfriend@gmail.com",
+  phone: businessData.phone || "",
+  phoneRaw: businessData.phoneRaw || "",
+  email: businessData.email || "",
   
   // Business Details
-  licenseNumber: "CA License #1067709",
-  address: {
-    street: "211 Jackson St.",
-    city: "Hayward",
-    state: "CA",
-    zip: "94544",
-    full: "211 Jackson St. Hayward, CA 94544",
-    region: "San Francisco Bay Area",
+  licenseNumber: "",
+  address: businessData.address || {
+    street: "",
+    city: "",
+    state: "",
+    zip: "",
+    full: "",
   },
   
   // Hours of Operation
   hours: {
-    weekdays: "Mon - Fri: 8AM - 4PM",
-    weekends: "Weekends: Closed",
-    emergency: "24/7 Emergency Service",
-    schema: "Mo-Fr 08:00-16:00",
+    weekdays: businessData.hours || "Mon - Fri: 8AM - 5PM",
+    weekends: "Weekends: By Appointment",
+    emergency: "",
+    schema: "Mo-Fr 08:00-17:00",
   },
   
-  // Service Areas
-  serviceAreas: [
-    "San Francisco",
-    "Santa Clara", 
-    "Walnut Creek",
-    "Tiburon",
-    "San Anselmo",
-    "Santa Cruz",
-    "Modesto",
-    "Kentfield",
-    "Santa Rosa",
-    "Alameda County",
-    "Contra Costa County",
-    "Petaluma",
-    "Los Gatos"
-  ],
+  // Service Areas - loaded from areas.json via hooks
+  serviceAreas: [] as string[],
   
   // Social Media Links
-  social: {
-    youtube: "https://www.youtube.com/@RoofingFriend",
-    instagram: "https://www.instagram.com/roofingfriend/",
-    facebook: "https://www.facebook.com/people/The-Roofing-Friend-Inc/100076473061858/",
-    tiktok: "https://www.tiktok.com/@roofingfriend?lang=en",
-    google: "https://share.google/VOkInHQUIXVepb7j3",
-    yelp: "https://www.yelp.com/biz/the-roofing-friend-hayward",
-    linkedin: "https://www.linkedin.com/company/metalroofingfriend",
-  },
+  social: businessData.social || {},
   
   // Logo
-  logo: "/lovable-uploads/7b6837e6-dcb1-4e40-a018-af62558a5502.png",
+  logo: businessData.logo || "",
   
   // SEO Defaults
   seo: {
-    defaultTitle: "Metal Roofing Friend - Premium Metal Roofing Services Bay Area",
-    defaultDescription: "Professional metal roofing installation, repair, and replacement services across the San Francisco Bay Area. Licensed, insured, and 25-year warranty. Free estimates.",
-    defaultKeywords: "metal roofing, roof installation, Bay Area roofing, San Francisco roofing, metal roof repair, standing seam, R-panel, roofing contractor",
-    siteName: "Metal Roofing Friend",
-    author: "Metal Roofing Friend",
+    defaultTitle: businessData.seo?.defaultTitle || businessData.name,
+    defaultDescription: businessData.seo?.description || businessData.description,
+    defaultKeywords: businessData.seo?.keywords?.join(", ") || "",
+    siteName: businessData.name,
+    author: businessData.name,
   },
   
   // Ratings
-  ratings: {
-    average: "4.9",
-    count: "150",
+  ratings: businessData.ratings || {
+    average: "5.0",
+    count: "0",
     best: "5",
     worst: "1",
   },
   
   // Pricing
-  priceRange: "$$-$$$",
+  priceRange: "$$",
   
-  // Services
-  services: [
-    { name: "Metal Roof Installation", path: "/metal-roof-installation" },
-    { name: "Roof Repair & Maintenance", path: "/roof-repair-maintenance" },
-    { name: "Standing Seam Systems", path: "/standing-seam-systems" },
-    { name: "R-Panel Installation", path: "/r-panel-installation" },
-    { name: "Commercial Roofing", path: "/commercial-roofing" },
-    { name: "Residential Roofing", path: "/residential-roofing" },
-  ],
+  // Services - loaded from services.json via hooks
+  services: [] as Array<{ name: string; path: string }>,
   
   // Warranty Info
   warranty: {
-    years: 25,
-    description: "25-year warranty covering materials and workmanship",
+    years: 0,
+    description: "",
   },
   
   // Geo coordinates (for schema.org)
   coordinates: {
-    lat: 37.7749,
-    lng: -122.4194,
+    lat: 0,
+    lng: 0,
   },
 } as const;
 
