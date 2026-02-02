@@ -3,10 +3,10 @@ import { useBusiness } from '../hooks/useBusinessConfig';
 
 /**
  * Simplified TenantContext for tenant CRMs
- * 
+ *
  * This version loads tenant data from local JSON config files (business.json)
  * instead of querying the multi-tenant Supabase database.
- * 
+ *
  * Tenant CRMs are standalone apps that don't need to query the MT database.
  */
 

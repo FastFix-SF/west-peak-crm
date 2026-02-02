@@ -214,7 +214,8 @@ export default function QuoteDetail() {
       if (imagery.provider === 'nearmap' && imagery.survey_id && imagery.bbox) {
         const coords = quote?.latitude && quote?.longitude ? `&lat=${quote.latitude}&lng=${quote.longitude}` : '';
         const bboxString = typeof imagery.bbox === 'object' && imagery.bbox ? `${imagery.bbox.minLng},${imagery.bbox.minLat},${imagery.bbox.maxLng},${imagery.bbox.maxLat}` : imagery.bbox;
-        return `https://mnitzgoythqqevhtkitj.supabase.co/functions/v1/nearmap-image-proxy?survey=${imagery.survey_id}&bbox=${bboxString}&width=1024&height=1024&format=jpeg${coords}`;
+        const functionsUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1`;
+        return `${functionsUrl}/nearmap-image-proxy?survey=${imagery.survey_id}&bbox=${bboxString}&width=1024&height=1024&format=jpeg${coords}`;
       }
       if (imagery.url) {
         return imagery.url;

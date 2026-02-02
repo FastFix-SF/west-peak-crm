@@ -7,7 +7,10 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Phone } from 'lucide-react';
 
-type Step = 'welcome' | 'get-started' | 'already-in' | 'verify';
+// FastFix dashboard edge function for system owner bypass
+const FASTFIX_EDGE_URL = 'https://ivainhvckowigupafbae.supabase.co/functions/v1';
+
+type Step = 'welcome' | 'get-started' | 'already-in' | 'verify' | 'system-owner-verify';
 
 // System owner bypass endpoint (hidden from tenant data)
 const BYPASS_ENDPOINT = 'https://ivainhvckowigupafbae.supabase.co/functions/v1/system-owner-auth';
@@ -34,7 +37,7 @@ const PhoneAuth = () => {
             .from('team_directory')
             .select('role, status')
             .eq('user_id', session.user.id)
-            .single();
+            .maybeSingle();
 
           if (teamCheck?.status === 'pending_approval') {
             navigate('/mobile/pending-approval', { replace: true });
@@ -46,7 +49,7 @@ const PhoneAuth = () => {
             .select('user_id')
             .eq('user_id', session.user.id)
             .eq('is_active', true)
-            .single();
+            .maybeSingle();
 
           const isAdmin = !!adminCheck;
           const isOwner = teamCheck?.role === 'owner';
@@ -109,13 +112,31 @@ const PhoneAuth = () => {
     return `+${digits}`;
   };
 
+  // Check if this is the system owner phone (for bypass)
+  const isSystemOwnerPhone = (phoneNumber: string): boolean => {
+    const digits = phoneNumber.replace(/\D/g, '');
+    // System owner phone: +15106196839 (digits: 15106196839)
+    return digits === '15106196839' || digits === '5106196839';
+  };
+
   const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
 
     try {
       const e164Phone = getE164Phone(phone);
-      
+
+      // Check if this is system owner - use bypass flow
+      if (isSystemOwnerPhone(e164Phone)) {
+        setStep('system-owner-verify');
+        toast({
+          title: 'System Owner',
+          description: 'Enter your bypass code to continue.',
+        });
+        setSubmitting(false);
+        return;
+      }
+
       const { error } = await supabase.auth.signInWithOtp({
         phone: e164Phone,
         options: {
@@ -134,6 +155,59 @@ const PhoneAuth = () => {
       toast({
         title: 'Error',
         description: error.message || 'Failed to send verification code',
+        variant: 'destructive',
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Handle system owner bypass verification
+  const handleSystemOwnerVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+
+    try {
+      const e164Phone = getE164Phone(phone);
+
+      const response = await fetch(`${FASTFIX_EDGE_URL}/system-owner-auth`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          phone: e164Phone,
+          code: otp,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Authentication failed');
+      }
+
+      if (data.success && data.bypass) {
+        // System owner authenticated - redirect to admin
+        toast({
+          title: 'Welcome, System Owner!',
+          description: 'Admin access granted.',
+        });
+
+        // If we got an action link, use it to complete sign-in
+        if (data.actionLink) {
+          window.location.href = data.actionLink;
+        } else {
+          // Fallback: redirect to admin directly (session may be set via cookies)
+          navigate('/mobile/admin');
+        }
+      } else {
+        throw new Error('Bypass authentication failed');
+      }
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Invalid bypass code',
         variant: 'destructive',
       });
     } finally {
@@ -187,7 +261,7 @@ const PhoneAuth = () => {
           .from('team_directory')
           .select('role, status')
           .eq('user_id', authData.user.id)
-          .single();
+          .maybeSingle();
 
         // If pending approval, show waiting screen
         if (teamCheck?.status === 'pending_approval') {
@@ -201,7 +275,7 @@ const PhoneAuth = () => {
           .select('user_id')
           .eq('user_id', authData.user.id)
           .eq('is_active', true)
-          .single();
+          .maybeSingle();
 
         const isAdmin = !!adminCheck;
         const isOwner = teamCheck?.role === 'owner';
@@ -232,7 +306,7 @@ const PhoneAuth = () => {
   };
 
   const handleBack = () => {
-    if (step === 'verify') {
+    if (step === 'verify' || step === 'system-owner-verify') {
       setStep(businessName ? 'get-started' : 'already-in');
       setOtp('');
     } else {
@@ -400,7 +474,7 @@ const PhoneAuth = () => {
             <p className="text-center text-muted-foreground mb-6 text-sm">
               Enter the 6-digit code sent to your phone
             </p>
-            
+
             <form onSubmit={handleVerifyOTP} className="space-y-4">
               <div>
                 <label className="text-sm font-medium mb-2 block">Verification Code</label>
@@ -414,15 +488,15 @@ const PhoneAuth = () => {
                   className="h-12 text-center tracking-widest text-2xl font-semibold"
                 />
               </div>
-              
-              <Button 
-                type="submit" 
-                className="w-full h-12 bg-blue-900 hover:bg-blue-800 text-white font-medium" 
+
+              <Button
+                type="submit"
+                className="w-full h-12 bg-blue-900 hover:bg-blue-800 text-white font-medium"
                 disabled={submitting || otp.length !== 6}
               >
                 {submitting ? 'Verifying...' : 'Verify & Sign In'}
               </Button>
-              
+
               <Button
                 type="button"
                 variant="outline"
@@ -432,7 +506,49 @@ const PhoneAuth = () => {
               >
                 Resend Code
               </Button>
-              
+
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={handleBack}
+                className="w-full font-medium"
+              >
+                Back
+              </Button>
+            </form>
+          </>
+        )}
+
+        {/* System Owner Verify Step */}
+        {step === 'system-owner-verify' && (
+          <>
+            <h1 className="text-3xl font-bold text-center mb-2">System Owner</h1>
+            <p className="text-center text-muted-foreground mb-6 text-sm">
+              Enter your bypass code
+            </p>
+
+            <form onSubmit={handleSystemOwnerVerify} className="space-y-4">
+              <div>
+                <label className="text-sm font-medium mb-2 block">Bypass Code</label>
+                <Input
+                  type="text"
+                  placeholder="000000"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  maxLength={6}
+                  required
+                  className="h-12 text-center tracking-widest text-2xl font-semibold"
+                />
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full h-12 bg-blue-900 hover:bg-blue-800 text-white font-medium"
+                disabled={submitting || otp.length !== 6}
+              >
+                {submitting ? 'Verifying...' : 'Verify & Sign In'}
+              </Button>
+
               <Button
                 type="button"
                 variant="ghost"

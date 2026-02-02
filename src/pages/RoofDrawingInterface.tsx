@@ -96,7 +96,7 @@ export default function RoofDrawingInterface() {
         .from('quote_requests')
         .select('*')
         .eq('id', id)
-        .single();
+        .maybeSingle();
       
       if (error) throw error;
       return data;
@@ -119,7 +119,8 @@ export default function RoofDrawingInterface() {
           ? `${imagery.bbox.minLng},${imagery.bbox.minLat},${imagery.bbox.maxLng},${imagery.bbox.maxLat}`
           : imagery.bbox;
           
-        return `https://mnitzgoythqqevhtkitj.supabase.co/functions/v1/nearmap-image-proxy?survey=${imagery.survey_id}&bbox=${bboxString}&width=1024&height=1024&format=jpeg${coords}`;
+        const functionsUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1`;
+        return `${functionsUrl}/nearmap-image-proxy?survey=${imagery.survey_id}&bbox=${bboxString}&width=1024&height=1024&format=jpeg${coords}`;
       }
       
       // If we have a direct URL for other providers, use it

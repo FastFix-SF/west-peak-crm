@@ -1,8 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
+import { supabase } from '@/integrations/supabase/client';
 
 let googleMapsLoaded = false;
 let loadPromise: Promise<void> | null = null;
+
+// Get the functions base URL from supabase client
+const getFunctionsUrl = () => {
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+  return `${supabaseUrl}/functions/v1`;
+};
 
 export const useGooglePlaces = () => {
   const [isLoaded, setIsLoaded] = useState(googleMapsLoaded);
@@ -21,13 +28,18 @@ export const useGooglePlaces = () => {
 
     const loadGoogleMaps = async () => {
       try {
+        // Get the current session for auth token
+        const { data: { session } } = await supabase.auth.getSession();
+        const authToken = session?.access_token;
+
         // Fetch API key from edge function
+        const functionsUrl = getFunctionsUrl();
         const response = await fetch(
-          `https://mnitzgoythqqevhtkitj.supabase.co/functions/v1/get-google-maps-key`,
+          `${functionsUrl}/get-google-maps-key`,
           {
-            headers: {
-              Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1uaXR6Z295dGhxcWV2aHRraXRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxOTA5MzUsImV4cCI6MjA2NTc2NjkzNX0.Jr38d0BgEIztZfIz2ZZ4fj-r0eKhfBEjwob5WWDXG2U`,
-            },
+            headers: authToken ? {
+              Authorization: `Bearer ${authToken}`,
+            } : {},
           }
         );
 
